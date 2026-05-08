@@ -196,7 +196,7 @@ const HomePage = () => {
   return (
     <div className="ds-porto">
       <HeroSection />
-      <MarqueeStrip />
+      {/* <MarqueeStrip /> */}
       <AboutSection />
       <WorksSection />
       <ContactSection />
