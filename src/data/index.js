@@ -22,30 +22,30 @@ export const navLinks = [
 export const projects = [
   {
     num: "01",
-    title: "E-Commerce Platform",
-    tags: ["React", "Node.js", "MongoDB"],
+    title: "CV Generator",
+    tags: ["React", "Node.js", "Python"],
     github: "https://github.com/danielsetiawn",
-    live: "#",
-  },
-  {
-    num: "02",
-    title: "Task Management App",
-    tags: ["Next.js", "TypeScript", "Prisma"],
-    github: "https://github.com/danielsetiawn",
-    live: "#",
-  },
-  {
-    num: "03",
-    title: "AI Chat Interface",
-    tags: ["React", "Python", "FastAPI"],
-    github: "https://github.com/danielsetiawn",
-    live: null,
-  },
-  {
-    num: "04",
-    title: "Portfolio Website",
-    tags: ["React", "Vite", "CSS"],
-    github: "https://github.com/danielsetiawn",
-    live: "#",
-  },
+    live: "https://cv-generator-five-rho.vercel.app/",
+  }
+  // {
+  //   num: "02",
+  //   title: "Task Management App",
+  //   tags: ["Next.js", "TypeScript", "Prisma"],
+  //   github: "https://github.com/danielsetiawn",
+  //   live: "#",
+  // },
+  // {
+  //   num: "03",
+  //   title: "AI Chat Interface",
+  //   tags: ["React", "Python", "FastAPI"],
+  //   github: "https://github.com/danielsetiawn",
+  //   live: null,
+  // },
+  // {
+  //   num: "04",
+  //   title: "Portfolio Website",
+  //   tags: ["React", "Vite", "CSS"],
+  //   github: "https://github.com/danielsetiawn",
+  //   live: "#",
+  // },
 ];

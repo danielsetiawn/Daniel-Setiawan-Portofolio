@@ -145,7 +145,7 @@ const WorksSection = () => (
       <h2 className="ds-works-title">Selected Work</h2>
       <span className="ds-label">02 — Projects</span>
     </div>
-    {/* <div>
+    <div>
       {projects.map((p, i) => (
         <a
           key={i}
@@ -165,7 +165,7 @@ const WorksSection = () => (
           <span className="ds-proj-arrow">↗</span>
         </a>
       ))}
-    </div> */}
+    </div>
   </section>
 );
 
