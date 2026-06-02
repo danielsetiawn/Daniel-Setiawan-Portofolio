@@ -59,16 +59,17 @@ const MarqueeStrip = () => (
 
 /* ── About Section ──────────────────────────────── */
 const repoCountCacheKey = 'ds-github-repo-count';
+const repoCountFallback = 4;
 
 const getCachedRepoCount = () => {
   try {
     const cached = localStorage.getItem(repoCountCacheKey);
-    if (cached === null) return null;
+    if (cached === null) return repoCountFallback;
 
     const count = Number(cached);
-    return Number.isFinite(count) ? count : null;
+    return Number.isFinite(count) ? count : repoCountFallback;
   } catch {
-    return null;
+    return repoCountFallback;
   }
 };
 
