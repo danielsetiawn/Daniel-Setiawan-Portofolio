@@ -58,17 +58,45 @@ const MarqueeStrip = () => (
 );
 
 /* ── About Section ──────────────────────────────── */
+const repoCountCacheKey = 'ds-github-repo-count';
+
+const getCachedRepoCount = () => {
+  try {
+    const cached = localStorage.getItem(repoCountCacheKey);
+    if (cached === null) return null;
+
+    const count = Number(cached);
+    return Number.isFinite(count) ? count : null;
+  } catch {
+    return null;
+  }
+};
+
 const AboutSection = () => {
-  const [repoCount, setRepoCount] = useState(null);
+  const [repoCount, setRepoCount] = useState(getCachedRepoCount);
 
   useEffect(() => {
-    fetch('https://api.github.com/users/danielsetiawn/repos?per_page=100')
-      .then(res => res.json())
-      .then(repos => {
-        if (Array.isArray(repos)) setRepoCount(repos.length);
-        else setRepoCount(0);
+    const controller = new AbortController();
+
+    fetch('https://api.github.com/users/danielsetiawn', { signal: controller.signal })
+      .then(res => {
+        if (!res.ok) throw new Error(`GitHub API error: ${res.status}`);
+        return res.json();
       })
-      .catch(() => setRepoCount(0));
+      .then(user => {
+        if (typeof user.public_repos === 'number') {
+          try {
+            localStorage.setItem(repoCountCacheKey, String(user.public_repos));
+          } catch {
+            // Ignore storage failures; the live value can still render.
+          }
+          setRepoCount(user.public_repos);
+        }
+      })
+      .catch((error) => {
+        if (error.name !== 'AbortError') setRepoCount(getCachedRepoCount());
+      });
+    return () => controller.abort();
   }, []);
 
   return (
