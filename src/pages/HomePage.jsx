@@ -1,8 +1,19 @@
 import { useEffect, useState } from 'react';
-import { projects } from '../data';
+import { projects, skills } from '../data';
 
 const repoCountCacheKey = 'ds-github-repo-count';
 const repoCountFallback = 4;
+
+const getYearsSince = (startYear, startMonth) => {
+  const startDate = new Date(startYear, startMonth - 1, 1);
+  const now = new Date();
+  let years = now.getFullYear() - startDate.getFullYear();
+  const monthDiff = now.getMonth() - startDate.getMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && now.getDate() < startDate.getDate())) {
+    years--;
+  }
+  return Math.max(1, years);
+};
 
 const getCachedRepoCount = () => {
   try {
@@ -43,7 +54,7 @@ const HeroSection = () => {
   return (
     <section className="ds-hero">
       <div className="ds-label" style={{ marginBottom: '44px' }}>
-        Portfolio - 2026
+        Portfolio — {new Date().getFullYear()}
       </div>
 
       <h1 className="ds-hero-name">
@@ -54,9 +65,9 @@ const HeroSection = () => {
 
       <div className="ds-hero-bottom">
         <div className="ds-hero-role">
-          CS Student @ BINUS University
+          CS Student @ BINUS University (Expected 2028)
           <br />
-          Full Stack Developer &amp; UI/UX Designer
+          Full Stack &amp; AI Engineer
           <br />
           Jakarta, Indonesia
         </div>
@@ -71,6 +82,8 @@ const HeroSection = () => {
 
 const AboutSection = () => {
   const [repoCount, setRepoCount] = useState(getCachedRepoCount);
+  const codingYears = getYearsSince(2024, 8);
+  const techCount = skills.reduce((total, group) => total + group.items.length, 0);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -113,7 +126,7 @@ const AboutSection = () => {
 
         <div className="ds-stat-grid">
           <div className="ds-stat">
-            <span className="ds-stat-num">2+</span>
+            <span className="ds-stat-num">{codingYears}+</span>
             <span className="ds-stat-lbl">Years</span>
           </div>
           <div className="ds-stat">
@@ -125,7 +138,7 @@ const AboutSection = () => {
             <span className="ds-stat-lbl">GitHub Repos</span>
           </div>
           <div className="ds-stat">
-            <span className="ds-stat-num">5+</span>
+            <span className="ds-stat-num">{techCount}+</span>
             <span className="ds-stat-lbl">Tech Stacks</span>
           </div>
         </div>
@@ -149,8 +162,35 @@ const AboutSection = () => {
   );
 };
 
+const SkillsSection = () => (
+  <section id="skills" className="ds-skills-section">
+    <div className="ds-skills-header reveal">
+      <h2 className="ds-skills-title">Tech Stack &amp; Tools</h2>
+      <span className="ds-label">Stack &amp; Expertise</span>
+    </div>
+
+    <div className="ds-skills-grid reveal">
+      {skills.map((group, index) => (
+        <div key={group.category} className="ds-skill-col">
+          <div className="ds-skill-col-header">
+            <span className="ds-skill-num">0{index + 1}</span>
+            <h3 className="ds-skill-category">{group.category}</h3>
+          </div>
+          <div className="ds-skill-tags">
+            {group.items.map((item) => (
+              <span key={item} className="ds-skill-tag">
+                {item}
+              </span>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+);
+
 const WorksSection = () => {
-  const [openIndex, setOpenIndex] = useState(null);
+  const [openIndex, setOpenIndex] = useState(0);
 
   const toggleProject = (index) => {
     setOpenIndex((current) => (current === index ? null : index));
@@ -165,6 +205,7 @@ const WorksSection = () => {
 
       {projects.map((project, index) => {
         const isOpen = openIndex === index;
+        const isOngoing = project.status === 'In Progress' || project.status === 'Ongoing';
 
         return (
           <article key={project.num} className="ds-accordion-item">
@@ -175,7 +216,15 @@ const WorksSection = () => {
             >
               <span className="ds-proj-num">{project.num}</span>
               <span className="ds-accordion-title-block">
-                <span className="ds-proj-title">{project.title}</span>
+                <span className="ds-proj-header-row">
+                  <span className="ds-proj-title">{project.title}</span>
+                  {isOngoing && (
+                    <span className="ds-status-pill in-progress">
+                      <span className="ds-status-dot" />
+                      {project.status}
+                    </span>
+                  )}
+                </span>
                 <span className="ds-proj-tags">
                   {project.tags.map((tag) => (
                     <span key={tag} className="ds-proj-tag">
@@ -184,7 +233,20 @@ const WorksSection = () => {
                   ))}
                 </span>
               </span>
-              <span className={`ds-accordion-chevron${isOpen ? ' open' : ''}`}>v</span>
+              <svg
+                className={`ds-accordion-chevron${isOpen ? ' open' : ''}`}
+                viewBox="0 0 24 24"
+                width="16"
+                height="16"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <polyline points="6 9 12 15 18 9" />
+              </svg>
             </button>
 
             <div className={`ds-accordion-body${isOpen ? ' open' : ''}`}>
@@ -192,6 +254,12 @@ const WorksSection = () => {
                 <div className="ds-accordion-badges">
                   <span className="ds-badge-type">{project.type}</span>
                   {project.isGroup && <span className="ds-badge-group">Group Project</span>}
+                  {project.status && (
+                    <span className={`ds-badge-status ${isOngoing ? 'in-progress' : ''}`}>
+                      {isOngoing && <span className="ds-status-dot" />}
+                      {project.status}
+                    </span>
+                  )}
                 </div>
 
                 <p className="ds-accordion-desc">{project.description}</p>
@@ -232,7 +300,7 @@ const WorksSection = () => {
                       rel="noreferrer"
                       className="ds-accordion-link"
                     >
-                      Live
+                      Live Demo ↗
                     </a>
                   )}
                   {project.github && (
@@ -242,7 +310,7 @@ const WorksSection = () => {
                       rel="noreferrer"
                       className="ds-accordion-link muted"
                     >
-                      GitHub
+                      GitHub ↗
                     </a>
                   )}
                 </div>
@@ -255,66 +323,86 @@ const WorksSection = () => {
   );
 };
 
-const ContactSection = () => (
-  <section id="contacts" className="ds-contact-section">
-    <div className="ds-contact-left reveal">
-      <div className="ds-label">03 - Contact</div>
-      <h2 className="ds-contact-big">
-        Let's
-        <br />
-        <em>work</em>
-        <br />
-        together.
-      </h2>
-    </div>
+const ContactSection = () => {
+  const [copied, setCopied] = useState(false);
 
-    <div className="ds-contact-right reveal">
-      <div>
-        <div className="ds-label" style={{ marginBottom: '14px' }}>
-          Get in touch
-        </div>
-        <a className="ds-contact-email" href="mailto:daniel100setiawan@gmail.com">
-          daniel100setiawan@gmail.com
-        </a>
+  const copyEmail = () => {
+    navigator.clipboard.writeText('daniel100setiawan@gmail.com');
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <section id="contacts" className="ds-contact-section">
+      <div className="ds-contact-left reveal">
+        <div className="ds-label">03 - Contact</div>
+        <h2 className="ds-contact-big">
+          Let's
+          <br />
+          <em>work</em>
+          <br />
+          together.
+        </h2>
       </div>
 
-      <div>
-        <div className="ds-label" style={{ marginBottom: '12px' }}>
-          Find me on
+      <div className="ds-contact-right reveal">
+        <div>
+          <div className="ds-label" style={{ marginBottom: '14px' }}>
+            Get in touch
+          </div>
+          <div className="ds-contact-email-row">
+            <a className="ds-contact-email" href="mailto:daniel100setiawan@gmail.com">
+              daniel100setiawan@gmail.com
+            </a>
+            <button
+              className="ds-contact-copy-btn"
+              onClick={copyEmail}
+              aria-label="Copy email address"
+              title="Copy email to clipboard"
+            >
+              {copied ? 'Copied!' : 'Copy'}
+            </button>
+          </div>
         </div>
-        <div className="ds-socials">
-          <a
-            className="ds-social"
-            href="https://github.com/danielsetiawn"
-            target="_blank"
-            rel="noreferrer"
-          >
-            GitHub
-          </a>
-          <a
-            className="ds-social"
-            href="https://www.linkedin.com/in/daniel-setiawan-03947231b/"
-            target="_blank"
-            rel="noreferrer"
-          >
-            LinkedIn
-          </a>
-          <a
-            className="ds-social"
-            href="https://www.instagram.com/daniel_setiawn/"
-            target="_blank"
-            rel="noreferrer"
-          >
-            Instagram
-          </a>
+
+        <div>
+          <div className="ds-label" style={{ marginBottom: '12px' }}>
+            Find me on
+          </div>
+          <div className="ds-socials">
+            <a
+              className="ds-social"
+              href="https://github.com/danielsetiawn"
+              target="_blank"
+              rel="noreferrer"
+            >
+              GitHub
+            </a>
+            <a
+              className="ds-social"
+              href="https://www.linkedin.com/in/daniel-setiawan-03947231b/"
+              target="_blank"
+              rel="noreferrer"
+            >
+              LinkedIn
+            </a>
+            <a
+              className="ds-social"
+              href="https://www.instagram.com/daniel_setiawn/"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Instagram
+            </a>
+          </div>
         </div>
       </div>
-    </div>
-  </section>
-);
+    </section>
+  );
+};
 
-const Footer = () => {
-  const [time, setTime] = useState(
+const LocalClock = () => {
+  const [time, setTime] = useState(() =>
     new Date().toLocaleTimeString('id-ID', {
       hour: '2-digit',
       minute: '2-digit',
@@ -336,14 +424,18 @@ const Footer = () => {
     return () => clearInterval(timer);
   }, []);
 
-  return (
-    <footer className="ds-footer">
-      <span className="ds-footer-copy">(c) 2026 Daniel Setiawan</span>
-      <span className="ds-footer-copy">Local Time - {time}</span>
-      <span className="ds-footer-copy">Jakarta, Indonesia</span>
-    </footer>
-  );
+  return <span>Local Time - {time}</span>;
 };
+
+const Footer = () => (
+  <footer className="ds-footer">
+    <span className="ds-footer-copy">(c) {new Date().getFullYear()} Daniel Setiawan</span>
+    <span className="ds-footer-copy">
+      <LocalClock />
+    </span>
+    <span className="ds-footer-copy">Jakarta, Indonesia</span>
+  </footer>
+);
 
 const HomePage = () => {
   useReveal();
@@ -352,6 +444,7 @@ const HomePage = () => {
     <div className="ds-porto">
       <HeroSection />
       <AboutSection />
+      <SkillsSection />
       <WorksSection />
       <ContactSection />
       <Footer />

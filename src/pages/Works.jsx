@@ -8,25 +8,40 @@ const Works = () => (
     </header>
 
     <div className="ds-works-list">
-      {projects.map((project) => (
-        <article key={project.num} className="ds-work-detail">
-          <div className="ds-work-detail-top">
-            <div className="ds-work-title-row">
-              <span>{project.num}</span>
-              <h2>{project.title}</h2>
+      {projects.map((project) => {
+        const isOngoing = project.status === 'In Progress' || project.status === 'Ongoing';
+
+        return (
+          <article key={project.num} className="ds-work-detail">
+            <div className="ds-work-detail-top">
+              <div className="ds-work-title-row">
+                <span>{project.num}</span>
+                <h2>{project.title}</h2>
+                {isOngoing && (
+                  <span className="ds-status-pill in-progress">
+                    <span className="ds-status-dot" />
+                    {project.status}
+                  </span>
+                )}
+              </div>
+
+              <div className="ds-work-tags">
+                {project.tags.map((tag) => (
+                  <span key={tag}>{tag}</span>
+                ))}
+              </div>
             </div>
 
-            <div className="ds-work-tags">
-              {project.tags.map((tag) => (
-                <span key={tag}>{tag}</span>
-              ))}
+            <div className="ds-work-badges">
+              <span>{project.type}</span>
+              {project.isGroup && <span>Group Project</span>}
+              {project.status && (
+                <span className={`ds-badge-status ${isOngoing ? 'in-progress' : ''}`}>
+                  {isOngoing && <span className="ds-status-dot" />}
+                  {project.status}
+                </span>
+              )}
             </div>
-          </div>
-
-          <div className="ds-work-badges">
-            <span>{project.type}</span>
-            {project.isGroup && <span>Group Project</span>}
-          </div>
 
           <p className="ds-work-description">{project.description}</p>
 
@@ -69,7 +84,8 @@ const Works = () => (
             )}
           </div>
         </article>
-      ))}
+      );
+    })}
     </div>
   </main>
 );

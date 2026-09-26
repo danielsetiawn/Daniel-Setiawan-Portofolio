@@ -22,68 +22,42 @@ const MoonIcon = () => (
   </svg>
 );
 
-const SystemIcon = () => (
-  <svg viewBox="0 0 24 24">
-    <rect x="2" y="3" width="20" height="14" rx="2" />
-    <line x1="8" y1="21" x2="16" y2="21" />
-    <line x1="12" y1="17" x2="12" y2="21" />
-  </svg>
-);
-
-const themeIcons = {
-  light: <SunIcon />,
-  dark: <MoonIcon />,
-  system: <SystemIcon />,
-};
-
-const themeOptions = ['light', 'dark', 'system'];
-
-const getSavedTheme = () => localStorage.getItem('ds-theme') || 'dark';
-
-const applyTheme = (theme) => {
-  const prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
-  const shouldUseLight = theme === 'light' || (theme === 'system' && prefersLight);
-
-  document.documentElement.classList.toggle('light', shouldUseLight);
+const getInitialTheme = () => {
+  const saved = localStorage.getItem('ds-theme');
+  if (saved === 'light' || saved === 'dark') return saved;
+  return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
 };
 
 const NavBarComponent = () => {
   const navigate = useNavigate();
-  const [currentTheme, setCurrentTheme] = useState(getSavedTheme);
-  const [isThemeOpen, setIsThemeOpen] = useState(false);
+  const [theme, setTheme] = useState(getInitialTheme);
 
   useEffect(() => {
-    applyTheme(currentTheme);
+    document.documentElement.classList.toggle('light', theme === 'light');
 
-    const query = window.matchMedia('(prefers-color-scheme: light)');
-    const handleSystemTheme = () => {
-      if (currentTheme === 'system') applyTheme('system');
-    };
-
-    query.addEventListener('change', handleSystemTheme);
-    return () => query.removeEventListener('change', handleSystemTheme);
-  }, [currentTheme]);
-
-  useEffect(() => {
-    const closeMenu = (event) => {
-      if (!event.target.closest('#nav-theme-dropdown')) {
-        setIsThemeOpen(false);
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: light)');
+    const handleSystemChange = (e) => {
+      if (!localStorage.getItem('ds-theme')) {
+        const newTheme = e.matches ? 'light' : 'dark';
+        setTheme(newTheme);
+        document.documentElement.classList.toggle('light', newTheme === 'light');
       }
     };
 
-    document.addEventListener('click', closeMenu);
-    return () => document.removeEventListener('click', closeMenu);
-  }, []);
+    mediaQuery.addEventListener('change', handleSystemChange);
+    return () => mediaQuery.removeEventListener('change', handleSystemChange);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    const nextTheme = theme === 'dark' ? 'light' : 'dark';
+    setTheme(nextTheme);
+    localStorage.setItem('ds-theme', nextTheme);
+    document.documentElement.classList.toggle('light', nextTheme === 'light');
+  };
 
   const goHome = () => {
     navigate('/');
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const setTheme = (theme) => {
-    localStorage.setItem('ds-theme', theme);
-    setCurrentTheme(theme);
-    setIsThemeOpen(false);
   };
 
   const handleNavClick = (link) => {
@@ -118,33 +92,23 @@ const NavBarComponent = () => {
       </div>
 
       <div className="ds-nav-right">
-        <div className="ds-nav-avail">
+        <button
+          className="ds-nav-avail"
+          onClick={() => handleNavClick({ sectionId: 'contacts' })}
+          title="Scroll to Contact"
+        >
           <span className="ds-nav-dot" />
-          Available
-        </div>
+          Open for work
+        </button>
 
-        <div className="ds-theme-dropdown" id="nav-theme-dropdown">
-          <button
-            className="ds-theme-btn"
-            onClick={() => setIsThemeOpen((open) => !open)}
-            aria-label="Toggle theme"
-          >
-            {themeIcons[currentTheme]}
-          </button>
-
-          <div className={`ds-dropdown-menu${isThemeOpen ? ' open' : ''}`}>
-            {themeOptions.map((theme) => (
-              <button
-                key={theme}
-                className={`ds-dropdown-item${currentTheme === theme ? ' active' : ''}`}
-                onClick={() => setTheme(theme)}
-              >
-                {themeIcons[theme]}
-                {theme.charAt(0).toUpperCase() + theme.slice(1)}
-              </button>
-            ))}
-          </div>
-        </div>
+        <button
+          className="ds-theme-btn"
+          onClick={toggleTheme}
+          aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+          title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+        >
+          {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
+        </button>
       </div>
     </nav>
   );
