@@ -96,6 +96,6 @@ export const projects = [
     tags: ["Python", "TensorFlow", "Deep Learning"],
     github: "https://github.com/danielsetiawn/ECG-analysis-for-arrhythmia-detection-with-deep-learning",
     live: null,
-    image: null,
+    image: "/images/early-arrhythmia.png",
   },
 ];
